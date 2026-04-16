@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+  <img src="logo.png">
+  <span>SafeLens</span>
+</div>
+
+<div class="box">
+
+  <h2>Entrar</h2>
+
+  <div class="group">
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+  </div>
+
+  <div class="group">
+    <button onclick="login()">Entrar</button>
+    <button onclick="navegar('cadastro.html')">Criar conta</button>
+  </div>
+
+  <div class="group">
+    <p id="codigo"></p>
+    <input id="cod" placeholder="Código">
+    <button onclick="verificar()">Verificar</button>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
