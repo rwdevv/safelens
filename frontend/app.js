@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+const API = "https://SEU-LINK.onrender.com";
 
 function navegar(pagina) {
   window.location.href = pagina;
