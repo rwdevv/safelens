@@ -7,13 +7,10 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, "public")));
 
 const SECRET = "segredo_super";
 
-// Banco em memória
 let usuarios = [];
 
 /* =========================
@@ -23,13 +20,13 @@ app.post("/register", (req, res) => {
   const { email, senha } = req.body;
 
   if (!email || !senha) {
-    return res.json({ erro: "Preencha todos os campos" });
+    return res.status(400).json({ erro: "Preencha todos os campos" });
   }
 
   const existe = usuarios.find((u) => u.email === email);
 
   if (existe) {
-    return res.json({ erro: "Usuário já existe" });
+    return res.status(400).json({ erro: "Usuário já existe" });
   }
 
   usuarios.push({
@@ -39,7 +36,7 @@ app.post("/register", (req, res) => {
     codigoExpira: null
   });
 
-  res.json({ mensagem: "Cadastro realizado ✔" });
+  return res.json({ mensagem: "Cadastro realizado com sucesso ✔" });
 });
 
 /* =========================
@@ -51,27 +48,27 @@ app.post("/login", (req, res) => {
   const user = usuarios.find((u) => u.email === email);
 
   if (!user) {
-    return res.json({ erro: "Usuário não encontrado" });
+    return res.status(404).json({ erro: "Usuário não encontrado" });
   }
 
   if (user.senha !== senha) {
-    return res.json({ erro: "Senha inválida" });
+    return res.status(401).json({ erro: "Senha inválida" });
   }
 
   const agora = Date.now();
 
   if (user.codigoExpira && user.codigoExpira > agora) {
-    return res.json({ erro: "Aguarde o código atual expirar ⏳" });
+    return res.status(400).json({ erro: "Aguarde o código atual expirar ⏳" });
   }
 
   const codigo = Math.floor(100000 + Math.random() * 900000).toString();
 
   user.codigo = codigo;
-  user.codigoExpira = agora + 2 * 60 * 1000; // 2 minutos
+  user.codigoExpira = agora + 2 * 60 * 1000;
 
   console.log("🔐 Código:", codigo);
 
-  res.json({ codigo });
+  return res.json({ codigo });
 });
 
 /* =========================
@@ -83,15 +80,15 @@ app.post("/verify", (req, res) => {
   const user = usuarios.find((u) => u.email === email);
 
   if (!user) {
-    return res.json({ erro: "Usuário não encontrado" });
+    return res.status(404).json({ erro: "Usuário não encontrado" });
   }
 
   if (user.codigo !== codigo) {
-    return res.json({ erro: "Código inválido ❌" });
+    return res.status(401).json({ erro: "Código inválido ❌" });
   }
 
   if (user.codigoExpira < Date.now()) {
-    return res.json({ erro: "Código expirado ⏰" });
+    return res.status(401).json({ erro: "Código expirado ⏰" });
   }
 
   const token = jwt.sign({ email }, SECRET, { expiresIn: "2h" });
@@ -99,7 +96,7 @@ app.post("/verify", (req, res) => {
   user.codigo = null;
   user.codigoExpira = null;
 
-  res.json({ token });
+  return res.json({ token });
 });
 
 /* =========================
@@ -109,9 +106,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-/* =========================
-   SERVIDOR
-========================= */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
