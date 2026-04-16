@@ -8,12 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const SECRET = "segredo_super";
-
-// 🔥 SERVIR FRONTEND
+// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, "public")));
 
-// 🔥 "BANCO" EM MEMÓRIA
+const SECRET = "segredo_super";
+
+// Banco em memória
 let usuarios = [];
 
 /* =========================
@@ -26,7 +26,7 @@ app.post("/register", (req, res) => {
     return res.json({ erro: "Preencha todos os campos" });
   }
 
-  const existe = usuarios.find(u => u.email === email);
+  const existe = usuarios.find((u) => u.email === email);
 
   if (existe) {
     return res.json({ erro: "Usuário já existe" });
@@ -48,10 +48,15 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, senha } = req.body;
 
-  const user = usuarios.find(u => u.email === email);
+  const user = usuarios.find((u) => u.email === email);
 
-  if (!user) return res.json({ erro: "Usuário não encontrado" });
-  if (user.senha !== senha) return res.json({ erro: "Senha inválida" });
+  if (!user) {
+    return res.json({ erro: "Usuário não encontrado" });
+  }
+
+  if (user.senha !== senha) {
+    return res.json({ erro: "Senha inválida" });
+  }
 
   const agora = Date.now();
 
@@ -62,7 +67,7 @@ app.post("/login", (req, res) => {
   const codigo = Math.floor(100000 + Math.random() * 900000).toString();
 
   user.codigo = codigo;
-  user.codigoExpira = agora + 2 * 60 * 1000;
+  user.codigoExpira = agora + 2 * 60 * 1000; // 2 minutos
 
   console.log("🔐 Código:", codigo);
 
@@ -75,9 +80,11 @@ app.post("/login", (req, res) => {
 app.post("/verify", (req, res) => {
   const { email, codigo } = req.body;
 
-  const user = usuarios.find(u => u.email === email);
+  const user = usuarios.find((u) => u.email === email);
 
-  if (!user) return res.json({ erro: "Usuário não encontrado" });
+  if (!user) {
+    return res.json({ erro: "Usuário não encontrado" });
+  }
 
   if (user.codigo !== codigo) {
     return res.json({ erro: "Código inválido ❌" });
