@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 const app = express();
 
@@ -9,6 +10,10 @@ app.use(express.json());
 
 const SECRET = "segredo_super";
 
+// 🔥 SERVIR FRONTEND
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🔥 "BANCO" EM MEMÓRIA
 let usuarios = [];
 
 /* =========================
@@ -90,6 +95,18 @@ app.post("/verify", (req, res) => {
   res.json({ token });
 });
 
-app.listen(3000, () => {
-  console.log("🚀 Servidor rodando em http://localhost:3000");
+/* =========================
+   ROTA PRINCIPAL
+========================= */
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+/* =========================
+   SERVIDOR
+========================= */
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("🚀 Servidor rodando na porta " + PORT);
 });
